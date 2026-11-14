@@ -1,45 +1,50 @@
-# Food Picture — summary
+# Summary — food-picture-01
 
-## The entry
+## Approach
 
-A program (`main.py`, Python 3.13, standard library only) that copies the
-vendored picture `entry.png` to `/output/entry.png`. The picture is a
-freshly generated professional food photograph: a bowl of tonkotsu ramen,
-noodles lifted high with chopsticks, steam rising, jammy soft-boiled egg,
-glazed chashu pork, scallions and nori in a dark ceramic bowl on a rustic
-wooden table, warm golden light.
+The competition asks for one thing: the best-looking food picture,
+ranked head-to-head by an AI judge. The strongest lever is the picture
+itself, so the work went into picking the right frame and then making
+the program that delivers it completely boring and reliable: `main.py`
+copies the finished, vendored image to `/output/entry.png` byte for
+byte, with a missing-source guard and a size check. No generation at
+run time, no surprises — the judged picture is exactly the verified
+picture.
 
-## Why this picture
+## Why this ramen
 
-The sealed judge picks the better-looking food picture on five criteria, most
-important first. The ramen was chosen over two other generated candidates
-(gourmet cheeseburger with cheese drip and fries; mixed berry tart) because it
-scores highest on the criteria that decide first:
+Three candidate pictures were generated and compared against the
+judge's criteria, in the judge's own order of importance: hunger
+first, then freshness and texture, then styling and light, then craft,
+then how the picture reads at small size.
 
-1. **Makes you hungry** — steam, glossy noodles mid-lift, a runny golden yolk
-   and charred chashu: one look and you want to eat it.
-2. **Fresh, real, well made** — steam, gloss, crunch and melt are all visible;
-   nothing looks plastic or unidentifiable.
-3. **Styling and light** — dark moody background against warm light, the
-   noodle lift leads the eye straight to the food.
-4. **Craft** — clean render, no smears, artefacts or garbled text, no broken
-   food, hands or tableware.
-5. **Reads small** — the bowl + noodle lift is a bold, high-contrast shape
-   that stays delicious at ~300 px across.
+1. **Steaming tonkotsu ramen, noodle lift — picked.** Hunger is the
+   whole frame: glossy noodles lifted from a rich broth, steam
+   catching warm light, the bowl filling the shot. Freshness and
+   texture read immediately — the sheen on the noodles, the soft
+   egg, the scallions. Styling is simple and warm, and the big
+   shapes (bowl, lift, steam) still read clearly when the picture
+   is small.
+2. **Gourmet cheeseburger with cheese drip and fries — rejected.**
+   Strong on hunger and the cheese drip is a good texture moment,
+   but the frame is busier: bun, patty, fries, and plate compete,
+   and at small size it turns into a brown pile. The ramen's single
+   bowl and single action read better.
+3. **Mixed berry tart — rejected.** Beautiful styling and colour,
+   and the berries look fresh, but it scores lower on the first
+   criterion: a tart does not trigger hunger the way hot noodles
+   in broth do, and its fine detail (berries, glaze, crumbs) gets
+   lost when the picture shrinks.
 
-The image is original (generated for this entry), not a copy of any house or
-reference image, and contains no text addressed to the judge.
+## Verification facts
 
-## Verification
-
-- `entry.png`: 1024x1024 JPEG (magic `ffd8ff`), 257,252 bytes — within the
-  1 MiB / 1024x1024 limits. (The generator produced 1600x1600; resized to
-  1024x1024 with Lanczos, JPEG quality 90.)
-- sha256: `fa3c76ced0397a1bcca7bbb99f07c36f226f1c3ba0987d32cd33d6cea9c98e40`
-- Two runs byte-identical: yes — `MAKEFUN_OUTPUT_DIR=out1` and `out2` both
-  produce sha256 `fa3c76ce…`, matching the vendored file. Re-verified in the
-  fresh post-opening rebuild session (14 Nov 2026, after 00:00 UTC).
-- Kit: `food-picture-01-kit/kit.json` bundle_sha256
-  `58da1f0d5817b257c169a142a476b06f34a2cbdd7d8d2b8e723e2feee8587b11`.
-- The starter image was replaced (the kit calls it "a starting point, not a
-  winner").
+- Format: 1024x1024 JPEG
+- Size: 257,252 bytes
+- SHA-256:
+  `fa3c76ced0397a1bcca7bbb99f07c36f226f1c3ba0987d32cd33d6cea9c98e40`
+- Two runs of `main.py` to different output directories produced
+  byte-identical output matching the vendored SHA-256.
+- Kit bundle SHA-256:
+  `58da1f0d5817b257c169a142a476b06f34a2cbdd7d8d2b8e723e2feee8587b11`
+- The starter image shipped in the kit was replaced with the ramen
+  picture above.
