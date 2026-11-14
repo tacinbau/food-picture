@@ -1,30 +1,72 @@
-# food-picture-01 entry (Python 3.13, standard library only).
-#
-# The picture lives next to this file as entry.png; the program copies it
-# byte-for-byte to /output/entry.png. The copy is deterministic: the output
-# bytes are exactly the vendored file's bytes, so repeated runs produce
-# identical files. The vendored picture is 1024x1024, 257,252 bytes — inside
-# the competition gate of <=1 MiB and <=1024x1024.
-#
-# Outside the grader's container, MAKEFUN_OUTPUT_DIR stands in for /output:
-#   mkdir -p out && MAKEFUN_OUTPUT_DIR=out python3 main.py
+#!/usr/bin/env python3
+"""Food-picture-01 entry for make.fun.
+
+The entry image is a finished, vendored picture (a steaming tonkotsu ramen
+bowl with a noodle lift) stored next to this script as ``entry.png``.
+This program does the one deterministic thing the competition asks for:
+it copies that picture, byte for byte, to the output directory as
+``entry.png``.
+
+No pixels are generated or altered at run time. Copying the vendored
+bytes keeps the output identical on every run, so the picture the
+judges see is exactly the picture that was picked and verified.
+
+The copy is deliberately plain: shutil.copyfile moves the bytes as
+they are, and the size check afterwards catches a truncated write.
+There is no image library involved — nothing to decode, re-encode,
+nor recompress — so the output hash can only ever equal the source
+hash.
+"""
 
 import os
 import shutil
+import sys
 from pathlib import Path
 
-SRC = Path(__file__).resolve().parent / "entry.png"
-OUT = Path(os.environ.get("MAKEFUN_OUTPUT_DIR", "/output")) / "entry.png"
+SOURCE_NAME = "entry.png"
+OUTPUT_NAME = "entry.png"
 
-if not SRC.is_file():
-    raise SystemExit(f"missing vendored image: {SRC}")
 
-OUT.parent.mkdir(parents=True, exist_ok=True)
-shutil.copyfile(SRC, OUT)
+def main() -> int:
+    script_dir = Path(__file__).resolve().parent
+    source = script_dir / SOURCE_NAME
 
-# Sanity-check the copy: same size as the vendored source, so a truncated
-# write can never slip through silently.
-if OUT.stat().st_size != SRC.stat().st_size:
-    raise SystemExit(f"copy incomplete: {OUT} ({OUT.stat().st_size} bytes) "
-                     f"!= source ({SRC.stat().st_size} bytes)")
-print(f"wrote {OUT} ({OUT.stat().st_size} bytes)")
+    if not source.is_file():
+        print(
+            f"error: vendored image not found: {source}",
+            file=sys.stderr,
+        )
+        print(
+            "error: entry.png must sit next to main.py",
+            file=sys.stderr,
+        )
+        return 1
+
+    output_dir = Path(os.environ.get("MAKEFUN_OUTPUT_DIR", "/output"))
+    output_dir.mkdir(parents=True, exist_ok=True)
+    destination = output_dir / OUTPUT_NAME
+
+    shutil.copyfile(source, destination)
+
+    source_size = source.stat().st_size
+    if source_size == 0:
+        print(
+            f"error: vendored image is empty: {source}",
+            file=sys.stderr,
+        )
+        return 1
+    dest_size = destination.stat().st_size
+    if dest_size != source_size:
+        print(
+            f"error: copied size {dest_size} does not match "
+            f"source size {source_size}",
+            file=sys.stderr,
+        )
+        return 1
+
+    print(f"wrote {destination} ({dest_size} bytes)")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
